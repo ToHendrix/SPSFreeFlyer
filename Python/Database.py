@@ -38,6 +38,9 @@ def dataset(file):
     if file == 'Aero_data.txt':
         del temp[0:89]
         del temp[-1]
+        temp.insert(0,['Density [cm^-3]', 'FFlux [cm^-2 s^-1]', 
+                    'BFlux [cm^-2 s^-1]', 'FFluence [cm^-2]', 
+                    'BFluence [cm^-2]', 'TMD [g cm^-3]', 'Angle [deg]'])
     if file == 'Coordinate_data.txt':
         del temp[0:73]
         del temp[-1]
@@ -47,6 +50,10 @@ def dataset(file):
     if file == 'Magnetic_field_data.txt':
         del temp[0:88]
         del temp[-1]
+        temp.insert(0,['B_LOC [Gauss]','L_LOC [?]','B_ALP [Gauss]','L_ALP [?]',
+                       'I_LOC [?]','I_ALP [Re]','B_SPH_RHO [Gauss]',
+                       'B_SPH_THETA [Gauss]','B_SPH_PHI [Gauss]','N_SPH_1 [-?]',
+                       'N_SPH_2 [-?]','N_SPH_3 [-?]'])
     
 
     return temp
