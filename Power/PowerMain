@@ -1,0 +1,60 @@
+# Import Necessary Packages
+import numpy as np
+
+#--------------------- Constants for Step ---------------------------------------------
+# Path Efficiencies
+nu_pd = 0.833
+nu_batt = 0.98
+
+Xe = nu_pd**2 * nu_batt**2
+Xd = nu_pd**2
+
+# Solar Array Paramters (phys and pointing)
+nu_sol = 0.3 # from the thermal thing
+Id = 0.72 #for triple triple junction
+theta = np.pi/4 #[rad] This is the AVERAGE incidence angle over the orbit!
+
+# Thermal coefficient and overall efficiency
+tc = -0.00168 #[/deg]
+T_delta = 75 #[deg]       # this is the worst-case upward temperature deviation
+nu_sol_tot = nu_sol - tc*T_delta
+
+# Orbital Parameters (worst case)
+T_e = 1072.65 #[s]
+T_d = 4064 #[s]
+SolFlux = 410.664 #[W/m2]
+
+# Power Needed from instrument given SMAD for day and night cycle. THIS WILL CHANGE
+Pd = 43.5 #[W]
+Pe = 0.4*Pd #[W]  Assumed to be 40% of the day power
+
+# Spec power incident on the array
+P0 = nu_sol_tot*SolFlux #[W/m2]
+
+# Other important things
+L = 5 #[years]
+D = 0.005 #[/year] Degradation factor, taken for TJ cells
+
+#---------------------- Functions ---------------------------------------------
+# Solar Array Required Power
+def solpow(T_e, T_d, Xe, Xd, Pe, Pd):
+    Psa = (Pe*T_e/Xe + Pd*T_d/Xd)/T_d
+    return Psa
+
+# Battery Battery Sizing
+def battpow(Pe, T_e, Xe):
+    Ebatt = Pe*T_e/Xe
+    return Ebatt
+
+# Pbol, Peol and Asa (req area of sol panels)
+def pgen(Psa):
+    Pbol = P0*Id*np.cos(theta)
+    Peol = Pbol*(1-D)**L
+    Asa = Psa/Peol
+    return Pbol, Peol, Asa
+
+#----------------------- Printing Values Here ----------------------------------
+Psa = solpow(T_e, T_d, Xe, Xd, Pe, Pd)
+print("Solar Array Power is: ", Psa, " W")
+print("Solar Battery Energy is: ", battpow(Pe, T_e, Xe), " J")
+print("Pbol, Peol and Asa are: ", pgen(Psa))
