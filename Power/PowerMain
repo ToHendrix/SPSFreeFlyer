@@ -59,4 +59,4 @@ Psa = solpow(T_e, T_d, Xe, Xd, Pe, Pd)
 print("Solar Array Power is: ", Psa, " W")
 print("Solar Battery Energy is: ", battpow(Pe, T_e, Xe), " J")
 print("Pbol, Peol and Asa are: ", pgen(Psa))
-
+print("aaaaaa")
