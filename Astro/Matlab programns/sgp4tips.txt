@@ -1,0 +1,5 @@
+mean motion: n = 2pi/T
+all derivatives of mean motion are 0, as no initial pertubations
+Catalog, Security and Identification number are not used
+Find out the Bstar for our satellite (probably dependent on ballistic coeff)
+Find out what Ephemeris type is and what the Element Number means
