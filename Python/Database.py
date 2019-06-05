@@ -44,9 +44,17 @@ def dataset(file):
     if file == 'Coordinate_data.txt':
         del temp[0:73]
         del temp[-1]
+        temp.insert(0,['MJD [days]', 'Altitude [km]', 'Latitude [deg]', 
+                       'Longitude [deg]', 'Local Time [hrs]', 'Alpha [deg]'])
     if file == 'Vector_data.txt':
         del temp[0:73]
         del temp[-1]
+        temp.insert(0,['Attitude_0 [?]', 'Attitude_1 [?]', 'Attitude_2 [?]', 
+                       'Attitude_3 [?]', 'Attitude_4 [?]', 'Attitude_5 [?]', 
+                       'Attitude_6 [?]', 'Attitude_7 [?]', 'Attitude_8 [?]', 
+                       'V_1 [km s^-1]', 'V_2 [km s^-1]', 'V_3 [km s^-1]', 
+                       'V_Sun_1 [km s^-1]', 'V_Sun_2 [km s^-1]', 
+                       'V_Sun_3 [km s^-1]'])
     if file == 'Magnetic_field_data.txt':
         del temp[0:88]
         del temp[-1]
