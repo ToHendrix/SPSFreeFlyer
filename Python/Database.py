@@ -21,9 +21,9 @@ import numpy as np
 f       = 1./298.2                                                             #Flattening of the earth [-]
 a_Earth = 6378160.                                                             #Semi-major axis Earth [m]
 b_Earth = a_Earth*(1. - f)                                                     #Semi-minor axis Earth [m] 
-
+t_yr = 31557600.                                                               #Duration year [s] 
 # =============================================================================
-# Creating the Aerodynamic Database
+# Creating the databases
 # =============================================================================
 def dataset(file):
     temp = []
@@ -48,8 +48,8 @@ def dataset(file):
         temp = np.asarray(temp).astype(np.float)
         temp[:,2] = np.deg2rad(temp[:,2])
         temp[:,3] = np.deg2rad(temp[:,3])
-#        temp = np.vstack((np.array(['MJD [days]', 'Altitude [km]', 'Latitude [deg]', 
-#                                    'Longitude [deg]', 'Local Time [hrs]', 
+#        temp = np.vstack((np.array(['MJD [days]', 'Altitude [km]', 'Latitude [rad]', 
+#                                    'Longitude [rad]', 'Local Time [hrs]', 
 #                                    'Alpha [deg]']), temp))
     if file == 'Vector_data.txt':
         del temp[0:73]
@@ -87,37 +87,122 @@ def dataset(file):
 
 aero_data = np.array(dataset('Aero_data.txt'))
 coor_elli_data = np.array(dataset('Coordinate_data.txt'))
-vect_data = np.array(dataset('Vector_data.txt'))
+vect_C_data = np.array(dataset('Vector_data.txt'))
 magn_data = np.array(dataset('Magnetic_field_data.txt'))
 
-def F_C():
-    temp = temp = np.zeros((43201,5))
+# =============================================================================
+# Converting the coordinate database from ellipsoidal coordinates to Cartesian
+# coordinates
+# =============================================================================
+
+def elli_to_C():
+    temp = np.zeros((43201,5))
     for i in range(len(coor_elli_data)):
         N   = a_Earth*(1. - f*(2. - f) * \
-                       (np.sin(coor_elli_data[i][2]))**2.)**-0.5               #The radius of curvature in the prime vertical [m]
-        x_C	= (N + coor_elli_data[i][1]*10.**3.) * \
-                       np.cos(coor_elli_data[i][2]) \
-                       * np.cos(coor_elli_data[i][3])                          #x coordinate C frame [m]
-        y_C	= (N + coor_elli_data[i][1]*10.**3.) * \
-                       np.cos(coor_elli_data[i][2]) \
-                       * np.sin(coor_elli_data[i][3])                          #y coordinate C frame [m]
+                       (np.sin(coor_elli_data[i,2]))**2.)**-0.5                #The radius of curvature in the prime vertical [m]
+        x_C	= (N + coor_elli_data[i,1]*10.**3.) * \
+                       np.cos(coor_elli_data[i,2]) \
+                       * np.cos(coor_elli_data[i,3])                           #x coordinate C frame [m]
+        y_C	= (N + coor_elli_data[i,1]*10.**3.) * \
+                       np.cos(coor_elli_data[i,2]) \
+                       * np.sin(coor_elli_data[i,3])                           #y coordinate C frame [m]
         e   = (a_Earth**2. - b_Earth**2.)**0.5 / a_Earth                       #The first eccentricity [-]
-        z_C	= (N*(1. - e**2.) + coor_elli_data[i][1]*10.**3.) * \
-                       np.sin(coor_elli_data[i][2])                            #z coordinate C frame [m]
+        z_C	= (N*(1. - e**2.) + coor_elli_data[i,1]*10.**3.) * \
+                       np.sin(coor_elli_data[i,2])                             #z coordinate C frame [m]
         temp[i] = [x_C, y_C, z_C, N, e]
     
     return temp
 
-coor_C = F_C()                                                                 #x_C, y_C, z_C, N, e
+coor_C_data = elli_to_C()                                                      #x_C, y_C, z_C, N, e
+
+# =============================================================================
+# Converting the coordinate database from the C frame to the E frame
+# =============================================================================
 
 
-T_EC = np.array([[-np.sin(coor_elli_data[9][2])*np.cos(coor_elli_data[9][3]), \
-                  -np.sin(coor_elli_data[9][3])*np.cos(coor_elli_data[9][2]), \
-                  np.cos(coor_elli_data[9][2])],
-                 [-np.sin(coor_elli_data[9][3]), np.cos(coor_elli_data[9][3]), 0],
-                 [-np.cos(coor_elli_data[9][2])*np.cos(coor_elli_data[9][3]), \
-                  -np.cos(coor_elli_data[9][2])*np.sin(coor_elli_data[9][3]), \
-                  -np.sin(coor_elli_data[9][2])]])
+def C_to_E(C_frame, angles):
+    temp = np.zeros((43201,3))
+    
+    for i in range(len(C_frame[:,0])):
+        T_EC = np.array([[-np.sin(angles[i,2])*np.cos(angles[i,3]), \
+                          -np.sin(angles[i,3])*np.cos(angles[i,2]), \
+                          np.cos(angles[i,2])],
+                         [-np.sin(angles[i,3]), np.cos(angles[i,3]), 0],
+                         [-np.cos(angles[i,2])*np.cos(angles[i,3]), \
+                          -np.cos(angles[i,2])*np.sin(angles[i,3]), \
+                          -np.sin(angles[i,2])]])
+        
+        temp[i] = np.dot(T_EC, np.transpose(np.array(C_frame[i,:3])))
+        
+    print (T_EC)
+    print ('yrug')
+    print (C_frame[i,:3])
+    print ('yrug')
+    print (temp[i])
+    return temp
+
+coor_E_data = C_to_E(coor_C_data, coor_elli_data)
+
+# =============================================================================
+# Converting the Sun vector from the E frame to the P frame
+# =============================================================================
+# Initialising the position of the ecliptic plane w.r.t. the Sun
+#Ecl_init = np.deg2rad(23.45)             #Ecliptic plane angle [rad] United States Naval Observatory (January 4, 2018). "Earth's Seasons and Apsides: Equinoxes, Solstices, Perihelion, and Aphelion"
+#t_pre = (9.*3600. + 14.*60)+ 7.*86400.                            #Time difference launch and solstice [s]
+#Ecl_launch = np.pi/2.*t_pre/(t_yr*0.25)                           #Angle of ecliptic plane maximum w.r.t. the Sun-Earth vector
+
+Sun_E_data = C_to_E(vect_C_data[:,-3:], coor_elli_data)
 
 
-Ecl_init = 23.45             # United States Naval Observatory (January 4, 2018). "Earth's Seasons and Apsides: Equinoxes, Solstices, Perihelion, and Aphelion"
+a = np.array([[-0.15371698, -0.77265011,  0.79923214],
+ [-0.96674054, -0.25575913,  0.        ],
+ [ 0.20441092, -0.77265011,  0.60102244]])
+
+b = np.array([[-1404660.91079299],\
+               [5309459.04713939],\
+               [-4104378.11331287]])
+
+
+c = np.dot(a, b)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
