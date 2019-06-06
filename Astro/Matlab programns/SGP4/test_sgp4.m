@@ -1,19 +1,35 @@
+%==========================================================================
+% MADE BY WILLEM VAN LYNDEN
+%==========================================================================
+%==========================================================================
+% Modified simple sgp4 orbit propagation programn
+%==========================================================================
+% This programn propogates an orbit of a satellite, using a Two Line
+% Element(TLE) input and a time (minutes since beginning of orbit) input.
+% Outputs are three-dimensional location and velocity in space
 clc
 clear
 format long g
 
+%==========================================================================
+% Set initial values
+%==========================================================================
 ge = 398600.8; % Earth gravitational constant
+Re = 6378.137;
 TWOPI = 2*pi;
 MINUTES_PER_DAY = 1440.;
 MINUTES_PER_DAY_SQUARED = (MINUTES_PER_DAY * MINUTES_PER_DAY);
 MINUTES_PER_DAY_CUBED = (MINUTES_PER_DAY * MINUTES_PER_DAY_SQUARED);
 
-% TLE file name 
+%==========================================================================
+% TLE file name
+%==========================================================================
 fname = 'hypotheticaltle.txt';
 
+%==========================================================================
 % Open the TLE file and read TLE elements
+%==========================================================================
 fid = fopen(fname, 'r');
-
 % 19-32	04236.56031392	Element Set Epoch (UTC)
 % 3-7	25544	Satellite Catalog Number
 % 9-16	51.6335	Orbit Inclination (degrees)
@@ -24,6 +40,11 @@ fid = fopen(fname, 'r');
 % 53-63	15.70406856	Mean Motion (revolutions/day)
 % 64-68	32890	Revolution Number at Epoch
 
+%==========================================================================
+% Main programn
+%==========================================================================
+
+% Read TLE lines
 while (1)
     % read first line
     tline = fgetl(fid);
@@ -59,6 +80,7 @@ while (1)
 end
 fclose(fid);
 
+% Calculate necessary values
 satdata.epoch = epoch;
 satdata.norad_number = Cnum;
 satdata.bulletin_number = ID;
@@ -75,13 +97,23 @@ satdata.xndt2o = TD1 * 1e-8 * TWOPI / MINUTES_PER_DAY_SQUARED;
 satdata.xndd6o = TD2 * TWOPI / MINUTES_PER_DAY_CUBED;
 satdata.bstar = BStar;
 
-tsince = 530000*100 + 54 ;
+%==========================================================================
+% Set Time input of moment of interest
+%==========================================================================
+tsince = 10300*100 + 54 ;
+
+%==========================================================================
+% Calculate output
+%==========================================================================
 [pos, vel] = sgp4(tsince, satdata);
-fprintf('     TSINCE              X                Y                Z     [km]\n');
-fprintf(' %9.1f%22.8f%18.8f%18.8f \n',tsince,pos(1),pos(2),pos(3));
-fprintf('                       XDOT             YDOT             ZDOT    [km/s]\n');
-fprintf('  %28.8f%18.8f%18.8f \n\n',vel(1),vel(2),vel(3));
-rnew = sqrt(pos(1)^2+pos(2)^2+pos(3)^2)
-Re = 6378.137;
-rnew - Re
-years = tsince/(60*24*365.25)
+rnew = sqrt(pos(1)^2+pos(2)^2+pos(3)^2);
+alt = rnew - Re;
+years = tsince/(60*24*365.25);
+
+%==========================================================================
+% Give output
+%==========================================================================
+fprintf('     TSINCE            radius              X                Y                Z     [km]\n');
+fprintf(' %9.1f%22.8f%18.8f%18.8f%18.8f \n',tsince,rnew,pos(1),pos(2),pos(3));
+fprintf('     Years             altitude            XDOT             YDOT             ZDOT    [km/s]\n');
+fprintf(' %9.1f%22.8f%18.8f%18.8f%18.8f \n',years,alt,vel(1),vel(2),vel(3));

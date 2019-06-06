@@ -13,23 +13,16 @@ clc
 clear
 format long g
 
-%==========================================================================
-% Set initial values
-%==========================================================================
 ge = 398600.8; % Earth gravitational constant
 TWOPI = 2*pi;
 MINUTES_PER_DAY = 1440.;
 MINUTES_PER_DAY_SQUARED = (MINUTES_PER_DAY * MINUTES_PER_DAY);
 MINUTES_PER_DAY_CUBED = (MINUTES_PER_DAY * MINUTES_PER_DAY_SQUARED);
 
-%==========================================================================
-% TLE file name
-%==========================================================================
+% TLE file name 
 fname = 'correctedtle.txt';
 
-%==========================================================================
 % Open the TLE file and read TLE elements
-%==========================================================================
 fid = fopen(fname, 'r');
 
 % 19-32	04236.56031392	Element Set Epoch (UTC)
@@ -42,11 +35,6 @@ fid = fopen(fname, 'r');
 % 53-63	15.70406856	Mean Motion (revolutions/day)
 % 64-68	32890	Revolution Number at Epoch
 
-%==========================================================================
-% Main programn
-%==========================================================================
-
-% Read TLE lines
 while (1)
     % read first line
     tline = fgetl(fid);
@@ -82,7 +70,6 @@ while (1)
 end
 fclose(fid);
 
-% Calculate necessary values
 satdata.epoch = epoch;
 satdata.norad_number = Cnum;
 satdata.bulletin_number = ID;
@@ -105,29 +92,21 @@ position = [];
 position2 = [];
 i = 0;
 j = 0;
-
-%==========================================================================
-% Set Time input of moments of interest
-%==========================================================================
-tfe = 24000*100 + 45;   % final orbit time end
-tfs = tfe - 1000;      % final orbit time start
-ti = 0; % initial orbit time
-
-%==========================================================================
-% Calculate output
-%==========================================================================
-while tfs < tfe
-    tsince = tfs;
+time = 24000*100 + 45;
+t = time - 1000;
+while t < time
+    tsince = t;
     [pos, vel] = sgp4(tsince, satdata);
     position = [position; [transpose(pos) i]];
-    tfs = tfs + 1;
+    t = t + 1;
     i = i + 1;
 end
-while ti < 1000 % initial orbit time period range
-    tsince = ti;
+tt = 0;
+while tt < 1000
+    tsince = tt;
     [pos, vel] = sgp4(tsince, satdata);
     position2 = [position2; [transpose(pos) j]];
-    ti = ti + 1;
+    tt = tt + 1;
     j = j + 1;
 end
 
@@ -137,9 +116,6 @@ end
 % colorbar
 % view(3)
 
-%==========================================================================
-% Give and plot output
-%==========================================================================
 figure;hold on
 Re = 6378.137;
 [x y z] = sphere;
@@ -151,4 +127,4 @@ plot3(position2(:,1),position2(:,2),position2(:,3))
 view(30,10)
 rnew = sqrt(position(end,1)^2+position(end,2)^2+position(end,3)^2);
 altitude = rnew - Re
-years = tfe/(60*24*365.25)
+years = time/(60*24*365.25)

@@ -4,11 +4,7 @@
 %==========================================================================
 % Modified simple sgp4 orbit propagation programn
 %==========================================================================
-% This programn propogates an orbit of a satellite, using a Two Line
-% Element(TLE) input and a time (minutes since beginning of orbit) input.
-% Outputs can be: visual orbit(s) of initial (ti) and final orbit (tf), including
-% years to final orbit. Also possible is to propagate multiple orbit from a
-% certain time (t1) to another (t2)
+
 clc
 clear
 format long g
@@ -17,6 +13,7 @@ format long g
 % Set initial values
 %==========================================================================
 ge = 398600.8; % Earth gravitational constant
+Re = 6378.137;
 TWOPI = 2*pi;
 MINUTES_PER_DAY = 1440.;
 MINUTES_PER_DAY_SQUARED = (MINUTES_PER_DAY * MINUTES_PER_DAY);
@@ -25,13 +22,12 @@ MINUTES_PER_DAY_CUBED = (MINUTES_PER_DAY * MINUTES_PER_DAY_SQUARED);
 %==========================================================================
 % TLE file name
 %==========================================================================
-fname = 'correctedtle.txt';
+fname = 'hypotheticaltle.txt';
 
 %==========================================================================
 % Open the TLE file and read TLE elements
 %==========================================================================
 fid = fopen(fname, 'r');
-
 % 19-32	04236.56031392	Element Set Epoch (UTC)
 % 3-7	25544	Satellite Catalog Number
 % 9-16	51.6335	Orbit Inclination (degrees)
@@ -98,57 +94,16 @@ satdata.xno = no * TWOPI / MINUTES_PER_DAY;
 satdata.xndt2o = TD1 * 1e-8 * TWOPI / MINUTES_PER_DAY_SQUARED;
 satdata.xndd6o = TD2 * TWOPI / MINUTES_PER_DAY_CUBED;
 satdata.bstar = BStar;
-X = [];
-Y = [];
-Z = [];
-position = [];
-position2 = [];
-i = 0;
-j = 0;
 
 %==========================================================================
-% Set Time input of moments of interest
-%==========================================================================
-tfe = 24000*100 + 45;   % final orbit time end
-tfs = tfe - 1000;      % final orbit time start
-ti = 0; % initial orbit time
-
-%==========================================================================
-% Calculate output
-%==========================================================================
-while tfs < tfe
-    tsince = tfs;
-    [pos, vel] = sgp4(tsince, satdata);
-    position = [position; [transpose(pos) i]];
-    tfs = tfs + 1;
-    i = i + 1;
-end
-while ti < 1000 % initial orbit time period range
-    tsince = ti;
-    [pos, vel] = sgp4(tsince, satdata);
-    position2 = [position2; [transpose(pos) j]];
-    ti = ti + 1;
-    j = j + 1;
-end
-
-
-% colormap(hsv)
-% patch(position(:,1),position(:,2),position(:,3),position(:,4),'FaceColor','none','EdgeColor','interp')
-% colorbar
-% view(3)
-
-%==========================================================================
-% Give and plot output
-%==========================================================================
-figure;hold on
-Re = 6378.137;
-[x y z] = sphere;
-a=[0 0 0 Re];
-s1=surf(x*a(1,4)+a(1,1),y*a(1,4)+a(1,2),z*a(1,4)+a(1,3));
-daspect([1 1 1])
-plot3(position(:,1),position(:,2),position(:,3))
-plot3(position2(:,1),position2(:,2),position2(:,3))
-view(30,10)
-rnew = sqrt(position(end,1)^2+position(end,2)^2+position(end,3)^2);
-altitude = rnew - Re
-years = tfe/(60*24*365.25)
+% Set 
+tsince = 530000*100 + 54 ;
+[pos, vel] = sgp4(tsince, satdata);
+rnew = sqrt(pos(1)^2+pos(2)^2+pos(3)^2);
+alt = rnew - Re;
+years = tsince/(60*24*365.25);
+vel(3)
+fprintf('     TSINCE            radius              X                Y                Z     [km]\n');
+fprintf(' %9.1f%22.8f%18.8f%18.8f%18.8f \n',tsince,rnew,pos(1),pos(2),pos(3));
+fprintf('     Years             altitude            XDOT             YDOT             ZDOT    [km/s]\n');
+fprintf(' %9.1f%22.8f%18.8f%18.8f%18.8f \n',years,alt,vel(1),vel(2),vel(3));
