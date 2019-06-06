@@ -9,7 +9,7 @@ MINUTES_PER_DAY_SQUARED = (MINUTES_PER_DAY * MINUTES_PER_DAY);
 MINUTES_PER_DAY_CUBED = (MINUTES_PER_DAY * MINUTES_PER_DAY_SQUARED);
 
 % TLE file name 
-fname = 'hypotheticaltle.txt';
+fname = 'correctedtle.txt';
 
 % Open the TLE file and read TLE elements
 fid = fopen(fname, 'r');
@@ -78,40 +78,42 @@ X = [];
 Y = [];
 Z = [];
 position = [];
-% position2 = [];
+position2 = [];
 i = 0;
-time = 17500*100;
-t = 0; %time - 1000
+j = 0;
+time = 24000*100 + 45;
+t = time - 1000;
 while t < time
     tsince = t;
     [pos, vel] = sgp4(tsince, satdata);
     position = [position; [transpose(pos) i]];
-    t = t + 50;
+    t = t + 1;
     i = i + 1;
 end
-% tt = 0;
-% while tt < 100
-%     tsince = tt;
-%     [pos, vel] = sgp4(tsince, satdata);
-%     position2 = [position2 pos];
-%     tt = tt + 1;
-% end
+tt = 0;
+while tt < 1000
+    tsince = tt;
+    [pos, vel] = sgp4(tsince, satdata);
+    position2 = [position2; [transpose(pos) j]];
+    tt = tt + 1;
+    j = j + 1;
+end
 
 
-colormap(hsv)
-patch(position(:,1),position(:,2),position(:,3),position(:,4),'FaceColor','none','EdgeColor','interp')
-colorbar
-view(3)
-% 
-% figure;hold on
-% Re = 6378.137;
-% [x y z] = sphere;
-% a=[0 0 0 Re];
-% s1=surf(x*a(1,4)+a(1,1),y*a(1,4)+a(1,2),z*a(1,4)+a(1,3));
-% daspect([1 1 1])
-% path = transpose(position)
-% % path2 = transpose(position2)
-% plot3(path(:,1),path(:,2),path(:,3),'k')
-% % plot3(path2(:,1),path2(:,2),path2(:,3))
-% view(30,10)
-% years = time/(60*24*365.25)
+% colormap(hsv)
+% patch(position(:,1),position(:,2),position(:,3),position(:,4),'FaceColor','none','EdgeColor','interp')
+% colorbar
+% view(3)
+
+figure;hold on
+Re = 6378.137;
+[x y z] = sphere;
+a=[0 0 0 Re];
+s1=surf(x*a(1,4)+a(1,1),y*a(1,4)+a(1,2),z*a(1,4)+a(1,3));
+daspect([1 1 1])
+plot3(position(:,1),position(:,2),position(:,3))
+plot3(position2(:,1),position2(:,2),position2(:,3))
+view(30,10)
+rnew = sqrt(position(end,1)^2+position(end,2)^2+position(end,3)^2);
+altitude = rnew - Re
+years = time/(60*24*365.25)

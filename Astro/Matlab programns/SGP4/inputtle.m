@@ -1,6 +1,7 @@
 % TLE input for a hypthetical satellite
 
 % Set values%
+values = [ ; ]
 Re = 6378.137*10^3;
 ph = 1350*10^3;
 ah = 9850*10^3;
@@ -28,7 +29,7 @@ v = sqrt(mu*((2/(a*(1-e)))-1/a));
 n = tday/T                              %revolutions per day
 
 bcoeff =(m/(Cd*A))
-Bstar = rho0true*(1/bcoeff)/2
+Bstar = rho0*(1/bcoeff)/2
 % Calculate inclination for sun-sync
 imax = 108.;
 imin = 98.;

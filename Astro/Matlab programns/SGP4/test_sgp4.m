@@ -75,7 +75,7 @@ satdata.xndt2o = TD1 * 1e-8 * TWOPI / MINUTES_PER_DAY_SQUARED;
 satdata.xndd6o = TD2 * TWOPI / MINUTES_PER_DAY_CUBED;
 satdata.bstar = BStar;
 
-tsince = 9013*5801 +3200 ;
+tsince = 530000*100 + 54 ;
 [pos, vel] = sgp4(tsince, satdata);
 fprintf('     TSINCE              X                Y                Z     [km]\n');
 fprintf(' %9.1f%22.8f%18.8f%18.8f \n',tsince,pos(1),pos(2),pos(3));
@@ -84,4 +84,4 @@ fprintf('  %28.8f%18.8f%18.8f \n\n',vel(1),vel(2),vel(3));
 rnew = sqrt(pos(1)^2+pos(2)^2+pos(3)^2)
 Re = 6378.137;
 rnew - Re
-years = tsince/(60*60*24*365.25)
+years = tsince/(60*24*365.25)
