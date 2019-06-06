@@ -18,7 +18,9 @@ import numpy as np
 # =============================================================================
 # Defining arrays and variables
 # =============================================================================
-
+f       = 1./298.2                                                             #Flattening of the earth [-]
+a_Earth = 6378160.                                                             #Semi-major axis Earth [m]
+b_Earth = a_Earth*(1. - f)                                                     #Semi-minor axis Earth [m] 
 
 # =============================================================================
 # Creating the Aerodynamic Database
@@ -44,6 +46,8 @@ def dataset(file):
         del temp[0:73]
         del temp[-1]
         temp = np.asarray(temp).astype(np.float)
+        temp[:,2] = np.deg2rad(temp[:,2])
+        temp[:,3] = np.deg2rad(temp[:,3])
 #        temp = np.vstack((np.array(['MJD [days]', 'Altitude [km]', 'Latitude [deg]', 
 #                                    'Longitude [deg]', 'Local Time [hrs]', 
 #                                    'Alpha [deg]']), temp))
@@ -78,11 +82,42 @@ def dataset(file):
 #                                    'B_SPH_RHO [Gauss]', 'B_SPH_THETA [Gauss]',
 #                                    'B_SPH_PHI [Gauss]','N_SPH_RHO [-?]',
 #                                    'N_SPH_THETA [-?]','N_SPH_PHI [-?]']), 
-#                                    temp))
+#                                    temp))   
+    return temp
+
+aero_data = np.array(dataset('Aero_data.txt'))
+coor_elli_data = np.array(dataset('Coordinate_data.txt'))
+vect_data = np.array(dataset('Vector_data.txt'))
+magn_data = np.array(dataset('Magnetic_field_data.txt'))
+
+def F_C():
+    temp = temp = np.zeros((43201,5))
+    for i in range(len(coor_elli_data)):
+        N   = a_Earth*(1. - f*(2. - f) * \
+                       (np.sin(coor_elli_data[i][2]))**2.)**-0.5               #The radius of curvature in the prime vertical [m]
+        x_C	= (N + coor_elli_data[i][1]*10.**3.) * \
+                       np.cos(coor_elli_data[i][2]) \
+                       * np.cos(coor_elli_data[i][3])                          #x coordinate C frame [m]
+        y_C	= (N + coor_elli_data[i][1]*10.**3.) * \
+                       np.cos(coor_elli_data[i][2]) \
+                       * np.sin(coor_elli_data[i][3])                          #y coordinate C frame [m]
+        e   = (a_Earth**2. - b_Earth**2.)**0.5 / a_Earth                       #The first eccentricity [-]
+        z_C	= (N*(1. - e**2.) + coor_elli_data[i][1]*10.**3.) * \
+                       np.sin(coor_elli_data[i][2])                            #z coordinate C frame [m]
+        temp[i] = [x_C, y_C, z_C, N, e]
     
     return temp
 
-aero_data = dataset('Aero_data.txt')
-coor_data = dataset('Coordinate_data.txt')
-vect_data = dataset('Vector_data.txt')
-magn_data = dataset('Magnetic_field_data.txt')
+coor_C = F_C()                                                                 #x_C, y_C, z_C, N, e
+
+
+T_EC = np.array([[-np.sin(coor_elli_data[9][2])*np.cos(coor_elli_data[9][3]), \
+                  -np.sin(coor_elli_data[9][3])*np.cos(coor_elli_data[9][2]), \
+                  np.cos(coor_elli_data[9][2])],
+                 [-np.sin(coor_elli_data[9][3]), np.cos(coor_elli_data[9][3]), 0],
+                 [-np.cos(coor_elli_data[9][2])*np.cos(coor_elli_data[9][3]), \
+                  -np.cos(coor_elli_data[9][2])*np.sin(coor_elli_data[9][3]), \
+                  -np.sin(coor_elli_data[9][2])]])
+
+
+Ecl_init = 23.45             # United States Naval Observatory (January 4, 2018). "Earth's Seasons and Apsides: Equinoxes, Solstices, Perihelion, and Aphelion"

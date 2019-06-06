@@ -12,7 +12,7 @@ Created on Wed Jun  5 14:32:59 2019
 # =============================================================================
 # Importing used packages, systems and files
 # =============================================================================
-from Database import magn_data, coor_data
+from Database import magn_data, coor_elli_data
 import numpy as np
 
 # =============================================================================
@@ -31,4 +31,4 @@ M_ext_magn = np.zeros((43201,3))
 magn_data = np.delete(magn_data, np.s_[0:6], axis=1)
 magn_data = np.delete(magn_data, np.s_[-3:], axis=1)
 for i in range(len(magn_data)):
-    M_ext_magn[i] = np.cross(np.transpose(M_res_dip), np.array([magn_data[i]]))
+    M_ext_magn[i] = np.cross(np.transpose(M_res_dip), [magn_data[i]])
