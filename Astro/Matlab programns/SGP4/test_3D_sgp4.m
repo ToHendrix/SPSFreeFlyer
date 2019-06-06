@@ -8,7 +8,7 @@
 % Element(TLE) input and a time (minutes since beginning of orbit) input.
 % Outputs can be: visual orbit(s) of initial (ti) and final orbit (tf), including
 % years to final orbit. Also possible is to propagate multiple orbit from a
-% certain time (t1) to another (t2)
+% certain time (t1) to another (t2) (time in minutes)
 clc
 clear
 format long g
