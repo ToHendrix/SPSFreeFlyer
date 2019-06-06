@@ -107,7 +107,7 @@ i = 0;
 j = 0;
 
 %==========================================================================
-% Set Time input of moments of interest
+% Set Time input of moments of interest IN MINUTES
 %==========================================================================
 tfe = 24000*100 + 45;   % final orbit time end
 tfs = tfe - 1000;      % final orbit time start

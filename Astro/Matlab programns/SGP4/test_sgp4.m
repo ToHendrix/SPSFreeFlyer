@@ -98,7 +98,7 @@ satdata.xndd6o = TD2 * TWOPI / MINUTES_PER_DAY_CUBED;
 satdata.bstar = BStar;
 
 %==========================================================================
-% Set Time input of moment of interest
+% Set Time input of moment of interest IN MINUTES
 %==========================================================================
 tsince = 10300*100 + 54 ;
 
