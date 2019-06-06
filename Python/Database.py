@@ -119,7 +119,6 @@ coor_C_data = elli_to_C()                                                      #
 # Converting the coordinate database from the C frame to the E frame
 # =============================================================================
 
-
 def C_to_E(C_frame, angles):
     temp = np.zeros((43201,3))
     
@@ -132,40 +131,25 @@ def C_to_E(C_frame, angles):
                           -np.cos(angles[i,2])*np.sin(angles[i,3]), \
                           -np.sin(angles[i,2])]])
         
-        temp[i] = np.dot(T_EC, np.transpose(np.array(C_frame[i,:3])))
+        temp[i] = np.dot(T_EC, C_frame[i,:3])
         
-    print (T_EC)
-    print ('yrug')
-    print (C_frame[i,:3])
-    print ('yrug')
-    print (temp[i])
     return temp
 
 coor_E_data = C_to_E(coor_C_data, coor_elli_data)
 
 # =============================================================================
-# Converting the Sun vector from the E frame to the P frame
+# Converting the coordinate database from the E frame to the P frame
 # =============================================================================
-# Initialising the position of the ecliptic plane w.r.t. the Sun
-#Ecl_init = np.deg2rad(23.45)             #Ecliptic plane angle [rad] United States Naval Observatory (January 4, 2018). "Earth's Seasons and Apsides: Equinoxes, Solstices, Perihelion, and Aphelion"
-#t_pre = (9.*3600. + 14.*60)+ 7.*86400.                            #Time difference launch and solstice [s]
-#Ecl_launch = np.pi/2.*t_pre/(t_yr*0.25)                           #Angle of ecliptic plane maximum w.r.t. the Sun-Earth vector
 
+# Converting the Sun vector from the E frame to the P frame
 Sun_E_data = C_to_E(vect_C_data[:,-3:], coor_elli_data)
 
+#Calculating the transformation angles
 
-a = np.array([[-0.15371698, -0.77265011,  0.79923214],
- [-0.96674054, -0.25575913,  0.        ],
- [ 0.20441092, -0.77265011,  0.60102244]])
-
-b = np.array([[-1404660.91079299],\
-               [5309459.04713939],\
-               [-4104378.11331287]])
+a = 
 
 
-c = np.dot(a, b)
-
-
+#alpha, beta gamma 
 
 
 
