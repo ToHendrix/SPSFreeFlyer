@@ -12,7 +12,7 @@ Created on Wed Jun  5 14:32:59 2019
 # =============================================================================
 # Importing used packages, systems and files
 # =============================================================================
-from Database import magn_data, coor_elli_data
+from Database import magn_sph_data, E_to_P
 import numpy as np
 
 # =============================================================================
@@ -28,7 +28,12 @@ M_ext_magn = np.zeros((43201,3))
 # =============================================================================
 
 # Cropping the magnetic field array
-magn_data = np.delete(magn_data, np.s_[0:6], axis=1)
-magn_data = np.delete(magn_data, np.s_[-3:], axis=1)
-for i in range(len(magn_data)):
-    M_ext_magn[i] = np.cross(np.transpose(M_res_dip), [magn_data[i]])
+magn_sph_data = np.delete(magn_sph_data, np.s_[0:6], axis=1)
+magn_sph_data = np.delete(magn_sph_data, np.s_[-3:], axis=1)
+magn_sph_data[:,1] = -magn_sph_data[:,1]
+magn_E_data = magn_sph_data
+
+magn_P_data = E_to_P(magn_E_data)
+
+for i in range(len(magn_P_data)):
+    M_ext_magn[i] = np.cross(np.transpose(M_res_dip), [magn_P_data[i]])

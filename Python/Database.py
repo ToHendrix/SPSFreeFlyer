@@ -88,7 +88,7 @@ def dataset(file):                                                             #
 aero_data = np.array(dataset('Aero_data.txt'))                                 #Calling up the creation of aero dataset 
 coor_elli_data = np.array(dataset('Coordinate_data.txt'))                      #Calling up the creation of coordinate dataset  
 vect_C_data = np.array(dataset('Vector_data.txt'))                             #Calling up the creation of vector dataset  
-magn_data = np.array(dataset('Magnetic_field_data.txt'))                       #Calling up the creation of magnetic field dataset  
+magn_sph_data = np.array(dataset('Magnetic_field_data.txt'))                       #Calling up the creation of magnetic field dataset  
 
 # =============================================================================
 # Converting the coordinate database from ellipsoidal coordinates to Cartesian
