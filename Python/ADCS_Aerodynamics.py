@@ -48,4 +48,4 @@ Moments = moments(r_plate, r_wall, Forces[0], Forces[1])
 # print(len(aero_data[:,1]))
 # print((aero_data[:,1]))
 # print((aero_data[:,1])**2**0.5)
-
+print("a")
