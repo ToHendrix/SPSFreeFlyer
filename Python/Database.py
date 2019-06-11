@@ -21,6 +21,7 @@ import numpy as np
 f       = 1./298.2                                                             #Flattening of the earth [-]
 a_Earth = 6378160.                                                             #Semi-major axis Earth [m]
 b_Earth = a_Earth*(1. - f)                                                     #Semi-minor axis Earth [m] 
+mu_earth = 3.986004418*(10**14)                                                #Standard gravitational parameter earth (m^3 s^-2) 
 
 # =============================================================================
 # Creating the databases
