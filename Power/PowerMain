@@ -1,7 +1,7 @@
 # Import Necessary Packages
 import numpy as np
 
-#--------------------- Constants for Step ---------------------------------------------
+#--------------------- Constants and Stuff---------------------------------------------
 # Path Efficiencies
 nu_pd = 0.833
 nu_batt = 0.98
@@ -12,7 +12,7 @@ Xd = nu_pd**2
 # Solar Array Paramters (phys and pointing)
 nu_sol = 0.3 # from the thermal thing
 Id = 0.72 #for triple triple junction
-theta = np.pi/4 #[rad] This is the AVERAGE incidence angle over the orbit!
+theta = np.pi/12 #[rad] This is the AVERAGE incidence angle over the orbit!
 
 # Thermal coefficient and overall efficiency
 tc = -0.00168 #[/deg]
@@ -20,14 +20,17 @@ T_delta = 75 #[deg]       # this is the worst-case upward temperature deviation
 nu_sol_tot = nu_sol - tc*T_delta
 
 # Orbital Parameters (worst case)
-T_e = 1072.65 #[s]
-T_d = 4064 #[s]
+Ttot = 5792 #[s]
+T_e = 2126 #[s]
+T_d = Ttot-T_e #[s]
 SolFlux = 410.664 #[W/m2]
+MaxPowerFactor = 0.7525
 
 # Power Needed from instrument given SMAD for day and night cycle. THIS WILL CHANGE
 avg_factor = 0.5
-Pinstrument = [20, 70, 100] #[W]
+Pinstrument = [20, 70, 100] 
 Pd = avg_factor*Pinstrument[2]/0.46 #[W]         Just change the index depending on the step, so step 1 is index 0. This is crude but IDGAF at this time.
+
 Pe = 0.4*Pd #[W]  Assumed to be 40% of the day power
 print(Pd)
 # Spec power incident on the array
