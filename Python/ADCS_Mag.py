@@ -29,9 +29,9 @@ M_ext_magn = np.zeros((43201,3))
 magn_sph_data = np.delete(magn_sph_data, np.s_[0:6], axis=1)                   #Cropping the magnetic field array to get spherical coordinates
 magn_sph_data = np.delete(magn_sph_data, np.s_[-3:], axis=1)                   #Cropping the magnetic field array to get spherical coordinates 
 magn_sph_data[:,1] = -magn_sph_data[:,1]                                       #Changing the direction of the soutward magnetic field component to be pointing north 
-magn_E_data = magn_sph_data                                                    #Writing the magnetic field array to the correct named variable 
+magn_E_data = magn_sph_data*10**-4                                             #Writing the magnetic field array to the correct named variable and unit [T]
 
 magn_P_data = E_to_P(magn_E_data)                                              #Tranforming the magnetic field from the E- to P-frame         
 
 for i in range(len(magn_P_data)):
-    M_ext_magn[i] = np.cross(np.transpose(M_res_dip), [magn_P_data[i]])        #Calculating magnetic field disturbance torque at every instance     
+    M_ext_magn[i] = np.cross(magn_P_data[i], np.transpose(M_res_dip))          #Calculating magnetic field disturbance torque at every instance 

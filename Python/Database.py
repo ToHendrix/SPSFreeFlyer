@@ -14,7 +14,9 @@ Created on Tue Jun  4 13:33:13 2019
 # Importing used packages, systems and files
 # =============================================================================
 import numpy as np
-
+import os
+cwd = os.getcwd()
+files = os.listdir(cwd)
 # =============================================================================
 # Defining arrays and variables
 # =============================================================================
@@ -22,9 +24,12 @@ f       = 1./298.2                                                             #
 a_Earth = 6378160.                                                             #Semi-major axis Earth [m]
 b_Earth = a_Earth*(1. - f)                                                     #Semi-minor axis Earth [m] 
 mu_earth = 3.986004418*(10**14)                                                #Standard gravitational parameter earth (m^3 s^-2) 
-h = 0.455                                                                      # [m], height of the SPS
-d = 1.                                                                         #[m], diameter of SPS
-C_D = 2.                                                                       # not sure, just using a high value
+h = 0.455                                                                      #[m], height of the SPS
+d = 0.937                                                                      #[m], diameter of Marman clamp
+r_in = d/2.                                                                    #Inner radius of the cylinderised SPS [m]
+r_out = r_in+10e-2                                                             #Outer radius of the cylinderised SPS [m] 
+C_D = 2.                                                                       #[-] not sure, just using a high value
+m = 250.                                                                       #Mass of the SPS [kg] 
 
 # =============================================================================
 # Creating the databases
@@ -91,14 +96,35 @@ def dataset(file):                                                             #
 
 aero_data = np.array(dataset('Aero_data.txt'))                                 #Calling up the creation of aero dataset 
 coor_elli_data = np.array(dataset('Coordinate_data.txt'))                      #Calling up the creation of coordinate dataset  
-vect_C_data = np.array(dataset('Vector_data.txt'))                             #Calling up the creation of vector dataset  
+vect_I_data = np.array(dataset('Vector_data.txt'))                             #Calling up the creation of vector dataset  
 magn_sph_data = np.array(dataset('Magnetic_field_data.txt'))                       #Calling up the creation of magnetic field dataset  
+
+# =============================================================================
+# Converting vector database from the interial to the Earth-centered 
+# reference frame
+# =============================================================================
+def I_to_C():
+    temp = np.zeros((43201,6)) 
+    
+    for i in range(len(coor_elli_data)):
+        theta = np.deg2rad(100.461 + 36000.770*(coor_elli_data[i,0]-51544.5)/36525.0 +\
+                           15.04107 * (coor_elli_data[i,0] - int(coor_elli_data[i,0]))\
+                           /24.)
+        T_CI = np.array([[np.cos(theta), np.sin(theta), 0],
+                         [-np.sin(theta), np.cos(theta), 0],
+                         [0, 0, 1]])
+        temp[i,0:3] = np.dot(T_CI, vect_I_data[i,9:12])
+        temp[i,3:6] = np.dot(T_CI, vect_I_data[i,12:15])
+    
+    return temp
+    
+vect_C_data = I_to_C()                                                         #V_x [km s^-1], V_y [km s^-1], V_z [km s^-1], Sun_norm_x [-], 'Sun_norm_y [-], Sun_norm_z [-]     
 
 # =============================================================================
 # Converting the coordinate database from ellipsoidal coordinates to Cartesian
 # coordinates
 # =============================================================================
-def elli_to_C():                                                               #     
+def elli_to_C():                                                                    
     temp = np.zeros((43201,5))
     for i in range(len(coor_elli_data)):
         N   = a_Earth*(1. - f*(2. - f) * \
@@ -126,18 +152,18 @@ def C_to_E(C_frame, angles):                                                   #
     
     for i in range(len(C_frame[:,0])):
         T_EC = np.array([[-np.sin(angles[i,2])*np.cos(angles[i,3]), \
-                          -np.sin(angles[i,3])*np.cos(angles[i,2]), \
+                          -np.sin(angles[i,2])*np.cos(angles[i,3]), \
                           np.cos(angles[i,2])],
                          [-np.sin(angles[i,3]), np.cos(angles[i,3]), 0],
                          [-np.cos(angles[i,2])*np.cos(angles[i,3]), \
                           -np.cos(angles[i,2])*np.sin(angles[i,3]), \
-                          -np.sin(angles[i,2])]])
-        
+                          -np.sin(angles[i,2])]])     
         temp[i] = np.dot(T_EC, C_frame[i,:3])                                  #Transforming every data point in the line used 
-        
+
     return temp
 
 coor_E_data = C_to_E(coor_C_data, coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame 
+vect_E_data = C_to_E(vect_C_data, coor_elli_data)
 
 # =============================================================================
 # Converting the coordinate database from the E frame to the P frame
@@ -164,40 +190,4 @@ def E_to_P(E_frame):                                                           #
     return temp
 
 coor_P_data = E_to_P(coor_E_data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+vect_P_data = E_to_P(vect_E_data)

@@ -12,24 +12,30 @@ Created on Fri Jun  7 16:39:44 2019
 # =============================================================================
 # Importing used packages, systems and files
 # =============================================================================
-from Database import magn_sph_data, E_to_P, mu
+from Database import mu_earth, coor_P_data, m, r_out, h
 import numpy as np
-from math import factorial as fact
-from scipy.misc import derivative as der
 
 # =============================================================================
 # Defining arrays and variables
 # =============================================================================
+M_ext_grav = np.zeros((43201,3))
 
+# =============================================================================
+# Calculating MMOIs
+# =============================================================================
+I_xx = 1./12.*m*(3*r_out**2 + h**2)
+I_yy = I_xx
+I_zz = 0.5*m*r_out**2
 
 # =============================================================================
 # Calculating gravity field potential
 # =============================================================================
-
-#n = 2
-#m = 3
-#delta = 3.1
-#P_n = 1/((-2)**n*fact(n))*der(np.sin(x), x0=delta, dx=1e-6)
-#P_nm = (1-np.(sin(delta))**2)**(m/2.)*der(np.sin(x), x0=delta, dx=1e-6)
-
-M_ext_grav = 3
+#Source: https://link.springer.com/content/pdf/bbm%3A978-3-642-25749-0%2F1.pdf
+for i in range(len(coor_P_data)):
+    r_p = coor_P_data[i,:3]/(np.sqrt((coor_P_data[i,0])**2+(coor_P_data[i,1])**2\
+        +(coor_P_data[i,2])**2))
+    J = np.array([[I_xx, 0, 0],
+                  [0, I_yy, 0],
+                  [0, 0, I_zz]])
+    M_ext_grav[i] = list(3*mu_earth/np.sqrt((coor_P_data[i,0])**2+(coor_P_data[i,1])**2\
+            +(coor_P_data[i,2])**2)**3 * np.cross(r_p, np.dot(J, r_p)))  
