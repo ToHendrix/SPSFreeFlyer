@@ -40,25 +40,8 @@ def moments(r_plate, r_wall, F_plate, F_wall): # calculates the moments due to p
 
 
 # ------------------------------------ Test (delet if annoying) -----------------------------------------------------------------------------
-# Forces = forces(C_D, rho, d)
-#print(Forces[1].shape)
-# F_p = Forces[0]
-# F_w = Forces[1]
-# print(F_p[:,2].shape)
-# print(F_w.shape)
-# print(F_p[:,2]-F_p[:,1])
-#print(F_p)
+Forces = forces(C_D, rho, d, V, Vu, beta)
+F_p = Forces[0]
+F_w = Forces[1]
 
-# Moments = moments(r_plate, r_wall, F_p, F_w)
-# print(Moments[2][1])
-
-#print(((vect_C_data[9][10]*1000)**2 + (vect_C_data[10][10]*1000)**2 + (vect_C_data[11][10]*1000)**2))
-#
-# print(len(aero_data[:,1]))
-# print((aero_data[:,1]))
-# print((aero_data[:,1])**2**0.5)
-# print((r_plate.transpose()-r_com.transpose()).shape)
-# print((r_plate-r_com))
-# print((np.matrix(Forces[0][:,1])).shape)
-# print((np.matrix(Forces[0][:,1])))
-# print( np.cross((r_plate.transpose()-r_com.transpose()), Forces[0][:,1])[2] )
+M_ext_aero = moments(r_plate, r_wall, F_p, F_w)
