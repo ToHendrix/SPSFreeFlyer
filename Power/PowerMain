@@ -27,8 +27,10 @@ SolFlux = 410.664 #[W/m2]
 MaxPowerFactor = 0.7525
 
 # Power Needed from instrument given SMAD for day and night cycle. THIS WILL CHANGE
-Pinstrument = [20, 70, 100] #[W]
-Pd = MaxPowerFactor*Pinstrument[0]/0.46 #[W]         Just change the index depending on the step, so step 1 is index 0. This is crude but IDGAF at this time.
+avg_factor = 0.5
+Pinstrument = [20, 70, 100] 
+Pd = avg_factor*Pinstrument[2]/0.46 #[W]         Just change the index depending on the step, so step 1 is index 0. This is crude but IDGAF at this time.
+
 Pe = 0.4*Pd #[W]  Assumed to be 40% of the day power
 print(Pd)
 # Spec power incident on the array
@@ -46,7 +48,7 @@ def solpow(T_e, T_d, Xe, Xd, Pe, Pd):
 
 # Battery Battery Sizing
 def battpow(Pe, T_e, Xe):
-    Ebatt = Pe*T_e/Xe
+    Ebatt = Pe*T_e/Xe + Pd*T_d/Xd
     return Ebatt
 
 # Pbol, Peol and Asa (req area of sol panels)
@@ -59,6 +61,6 @@ def pgen(Psa):
 #----------------------- Printing Values Here ----------------------------------
 Psa = solpow(T_e, T_d, Xe, Xd, Pe, Pd)
 print("Solar Array Power is: ", Psa, " W")
-print("Solar Battery Energy is: ", battpow(Pe, T_e, Xe), " J")
+print("Req Battery Energy is: ", battpow(Pe, T_e, Xe)/3600, " Wh")
 print("Pbol, Peol and Asa are: ", pgen(Psa))
-
+print ("a")
