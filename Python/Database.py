@@ -94,10 +94,10 @@ def dataset(file):                                                             #
 #                                    temp))   
     return temp                                                                #Returning the final dataset array 
 
-aero_data = np.array(dataset('Aero_data.txt'))                                 #Calling up the creation of aero dataset 
-coor_elli_data = np.array(dataset('Coordinate_data.txt'))                      #Calling up the creation of coordinate dataset  
-vect_I_data = np.array(dataset('Vector_data.txt'))                             #Calling up the creation of vector dataset  
-magn_sph_data = np.array(dataset('Magnetic_field_data.txt'))                       #Calling up the creation of magnetic field dataset  
+aero_data = np.array(dataset('Aero_data.txt'))                                 #Calling up the creation of aero dataset
+coor_elli_data = np.array(dataset('Coordinate_data.txt'))                      #Calling up the creation of coordinate dataset in ellipsoidal coordinates 
+vect_I_data = np.array(dataset('Vector_data.txt'))                             #Calling up the creation of vector dataset in the GEI reference frame  
+magn_sph_data = np.array(dataset('Magnetic_field_data.txt'))                   #Calling up the creation of magnetic field dataset in spherical coordinates  
 
 # =============================================================================
 # Converting vector database from the interial to the Earth-centered 
@@ -107,14 +107,14 @@ def I_to_C():
     temp = np.zeros((43201,6)) 
     
     for i in range(len(coor_elli_data)):
-        theta = np.deg2rad(100.461 + 36000.770*(coor_elli_data[i,0]-51544.5)/36525.0 +\
-                           15.04107 * (coor_elli_data[i,0] - int(coor_elli_data[i,0]))\
-                           /24.)
-        T_CI = np.array([[np.cos(theta), np.sin(theta), 0],
+        theta = np.deg2rad(100.461 + 36000.770*(coor_elli_data[i,0]-51544.5)/\
+                           36525.0 + 15.04107 * (coor_elli_data[i,0] - \
+                           int(coor_elli_data[i,0]))/24.)                      #Greenwich mean sidereal time [rad] 
+        T_CI = np.array([[np.cos(theta), np.sin(theta), 0],                    #Transformation matrix from the GEI to GEO reference frame             
                          [-np.sin(theta), np.cos(theta), 0],
                          [0, 0, 1]])
-        temp[i,0:3] = np.dot(T_CI, vect_I_data[i,9:12])
-        temp[i,3:6] = np.dot(T_CI, vect_I_data[i,12:15])
+        temp[i,0:3] = np.dot(T_CI, vect_I_data[i,9:12])                        #Appending the transformation for the velocities [km/s] 
+        temp[i,3:6] = np.dot(T_CI, vect_I_data[i,12:15])                       #Appending the transformation for the normalised sun vector [-] 
     
     return temp
     
@@ -157,37 +157,37 @@ def C_to_E(C_frame, angles):                                                   #
                          [-np.sin(angles[i,3]), np.cos(angles[i,3]), 0],
                          [-np.cos(angles[i,2])*np.cos(angles[i,3]), \
                           -np.cos(angles[i,2])*np.sin(angles[i,3]), \
-                          -np.sin(angles[i,2])]])     
+                          -np.sin(angles[i,2])]])                              #Transformation matrix from the C- to the E-frame 
         temp[i] = np.dot(T_EC, C_frame[i,:3])                                  #Transforming every data point in the line used 
 
     return temp
 
-coor_E_data = C_to_E(coor_C_data, coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame 
-vect_E_data = C_to_E(vect_C_data, coor_elli_data)
+coor_E_data = C_to_E(coor_C_data, coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame for the coordinate dataset
+vect_E_data = C_to_E(vect_C_data, coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame for the vector dataset                 
 
 # =============================================================================
 # Converting the coordinate database from the E frame to the P frame
 # =============================================================================
-Sun_E_data = C_to_E(vect_C_data[:,-3:], coor_elli_data)                        # Converting the Sun vector from the E frame to the P frame 
+Sun_E_data = C_to_E(vect_C_data[:,-3:], coor_elli_data)                        # Converting the Sun vector from the C- to the P-frame 
 
-def E_to_P(E_frame):                                                           #Definition to transform from the C- to the E-frame with the z-axis pointing at the Sun 
+def E_to_P(E_frame):                                                           #Definition to transform from the E- to the P-frame with the z-axis pointing at the Sun 
     temp = np.zeros((43201,3))
     
     for i in range(len(E_frame[:,0])):
         alpha = np.arctan2(Sun_E_data[i,1], Sun_E_data[i,2]) -\
-        np.arctan2(coor_E_data[i,1], coor_E_data[i,2])  
+        np.arctan2(coor_E_data[i,1], coor_E_data[i,2])                         #Angle between the z-axis in the E-frame and the sun vector, depicted in the (z,y)-plane in the E-frame     
         beta = np.arctan2(Sun_E_data[i,0], Sun_E_data[i,2]) - \
-        np.arctan2(coor_E_data[i,0], coor_E_data[i,2])
+        np.arctan2(coor_E_data[i,0], coor_E_data[i,2])                         #Angle between the z-axis in the E-frame and the sun vector, depicted in the (z,x)-plane in the E-frame   
 
         T_PE = np.array([[np.cos(beta), np.sin(beta)*np.sin(alpha), \
                           np.sin(beta)*np.cos(beta)],
                  [0., np.cos(alpha), -np.sin(alpha)],
                  [-np.sin(beta), np.cos(beta)*np.sin(alpha), \
-                  np.cos(beta)*np.cos(alpha)]])
+                  np.cos(beta)*np.cos(alpha)]])                                #Transformation matrix from the E- to the P-frame 
         
         temp[i] = np.dot(T_PE, E_frame[i,:3])
         
     return temp
 
-coor_P_data = E_to_P(coor_E_data)
-vect_P_data = E_to_P(vect_E_data)
+coor_P_data = E_to_P(coor_E_data)                                              #Calling up the transformation from coordinate E- to P-frame for the coordinate dataset     
+vect_P_data = E_to_P(vect_E_data)                                              #Calling up the transformation from coordinate E- to P-frame for the vector dataset              

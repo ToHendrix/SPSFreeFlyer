@@ -21,7 +21,7 @@ import numpy as np
 M_res_dip = np.array([[0.2],                                                   #Residual Dipole Moment [A m^2]
                     [0.2],
                     [0.2]])
-M_ext_magn = np.zeros((43201,3))
+M_ext_magn = np.zeros((43201,3))                                               #Empty array for the magnetic field moment
 
 # =============================================================================
 # Initialising the arrays used
