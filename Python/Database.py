@@ -30,6 +30,9 @@ r_in = d/2.                                                                    #
 r_out = r_in+10e-2                                                             #Outer radius of the cylinderised SPS [m] 
 C_D = 2.                                                                       #[-] not sure, just using a high value
 m = 250.                                                                       #Mass of the SPS [kg] 
+I_xx = 1./12.*m*(3*r_out**2 + h**2)                                            #MMOI around the x-axis [kg m^2] 
+I_yy = I_xx                                                                    #MMOI around the y-axis [kg m^2] 
+I_zz = 0.5*m*r_out**2                                                          #MMOI around the z-axis [kg m^2]  
 
 # =============================================================================
 # Creating the databases

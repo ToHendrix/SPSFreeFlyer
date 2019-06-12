@@ -21,13 +21,6 @@ import numpy as np
 M_ext_grav = np.zeros((43201,3))                                               #Empty array for the gravitational field moment     
 
 # =============================================================================
-# Calculating MMOIs
-# =============================================================================
-I_xx = 1./12.*m*(3*r_out**2 + h**2)                                            #MMOI around the x-axis [kg m^2] 
-I_yy = I_xx                                                                    #MMOI around the y-axis [kg m^2] 
-I_zz = 0.5*m*r_out**2                                                          #MMOI around the z-axis [kg m^2]  
-
-# =============================================================================
 # Calculating gravity field potential
 # =============================================================================
 #Source: https://link.springer.com/content/pdf/bbm%3A978-3-642-25749-0%2F1.pdf
