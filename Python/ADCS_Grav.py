@@ -12,7 +12,7 @@ Created on Fri Jun  7 16:39:44 2019
 # =============================================================================
 # Importing used packages, systems and files
 # =============================================================================
-from Database import mu_earth, coor_P_data, m, r_out, h
+from Database import mu_earth, coor_P_data, m, r_out, r_in, h
 import numpy as np
 
 # =============================================================================
@@ -23,9 +23,9 @@ M_ext_grav = np.zeros((43201,3))                                               #
 # =============================================================================
 # Calculating MMOIs
 # =============================================================================
-I_xx = 1./12.*m*(3*r_out**2 + h**2)                                            #MMOI around the x-axis [kg m^2] 
+I_xx = 1./12.*m*(3*(r_out**2 + r_in**2) + h**2)                                #MMOI around the x-axis [kg m^2] 
 I_yy = I_xx                                                                    #MMOI around the y-axis [kg m^2] 
-I_zz = 0.5*m*r_out**2                                                          #MMOI around the z-axis [kg m^2]  
+I_zz = 0.5*m*(r_out**2 + r_in**2)                                              #MMOI around the z-axis [kg m^2]  
 
 # =============================================================================
 # Calculating gravity field potential

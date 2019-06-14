@@ -27,7 +27,7 @@ mu_earth = 3.986004418*(10**14)                                                #
 h = 0.455                                                                      #[m], height of the SPS
 d = 0.937                                                                      #[m], diameter of Marman clamp
 r_in = d/2.                                                                    #Inner radius of the cylinderised SPS [m]
-r_out = r_in+10e-2                                                             #Outer radius of the cylinderised SPS [m] 
+r_out = r_in+20e-2                                                             #Outer radius of the cylinderised SPS [m] 
 C_D = 2.                                                                       #[-] not sure, just using a high value
 m = 250.                                                                       #Mass of the SPS [kg]  
 
@@ -164,7 +164,7 @@ def C_to_E(C_frame, angles):                                                   #
     return temp
 
 coor_E_data = C_to_E(coor_C_data, coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame for the coordinate dataset
-vect_E_data = C_to_E(vect_C_data[:,:3], coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame for the vector dataset                 
+vect_E_data = C_to_E(vect_C_data[:,:3], coor_elli_data)                        #Calling up the transformation from coordinate C- to E-frame for the vector dataset                 
 
 # =============================================================================
 # Converting the coordinate database from the E frame to the P frame
