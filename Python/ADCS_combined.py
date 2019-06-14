@@ -24,7 +24,6 @@ import numpy as np
 # =============================================================================
 tau_build = np.zeros((43201,3))
 tau_orb = np.zeros((431,4))
-
 # =============================================================================
 # Calculating the mission torque profile
 # =============================================================================
@@ -48,4 +47,5 @@ for i in range(int(len(tau_build)/100)-1):
     sum(tau_build[100*i:100*(i+1),2]), sum(tau_build[100*i:100*(i+1),0]), \
     sum(tau_build[100*i:100*(i+1),1]), sum(tau_build[100*i:100*(i+1),2])       #momentum build-up per orbit (Total, x, y, z) [Nms]                          
 
-tau_orb_max = np.amax(tau_orb)
+tau_orb_max = np.array([np.amax(tau_orb[:,0]), np.amax(tau_orb[:,1]), \
+                        np.amax(tau_orb[:,2])])
