@@ -27,7 +27,7 @@ mu_earth = 3.986004418*(10**14)                                                #
 h = 0.455                                                                      #[m], height of the SPS
 d = 0.937                                                                      #[m], diameter of Marman clamp
 r_in = d/2.                                                                    #Inner radius of the cylinderised SPS [m]
-r_out = r_in+10e-2                                                             #Outer radius of the cylinderised SPS [m] 
+r_out = r_in+20e-2                                                             #Outer radius of the cylinderised SPS [m] 
 C_D = 2.                                                                       #[-] not sure, just using a high value
 m = 250.                                                                       #Mass of the SPS [kg]  
 
@@ -118,7 +118,7 @@ def I_to_C():
     
     return temp
     
-vect_C_data = I_to_C()                                                         #V_x [km s^-1], V_y [km s^-1], V_z [km s^-1], Sun_norm_x [-], 'Sun_norm_y [-], Sun_norm_z [-]     
+vect_C_data = I_to_C()                                                         #V_x [km s^-1], V_y [km s^-1], V_z [km s^-1], Sun_norm_x [-], Sun_norm_y [-], Sun_norm_z [-]     
 
 # =============================================================================
 # Converting the coordinate database from ellipsoidal coordinates to Cartesian
@@ -126,6 +126,7 @@ vect_C_data = I_to_C()                                                         #
 # =============================================================================
 def elli_to_C():                                                                    
     temp = np.zeros((43201,5))
+    
     for i in range(len(coor_elli_data)):
         N   = a_Earth*(1. - f*(2. - f) * \
                        (np.sin(coor_elli_data[i,2]))**2.)**-0.5                #The radius of curvature in the prime vertical [m]
@@ -163,7 +164,7 @@ def C_to_E(C_frame, angles):                                                   #
     return temp
 
 coor_E_data = C_to_E(coor_C_data, coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame for the coordinate dataset
-vect_E_data = C_to_E(vect_C_data, coor_elli_data)                              #Calling up the transformation from coordinate C- to E-frame for the vector dataset                 
+vect_E_data = C_to_E(vect_C_data[:,:3], coor_elli_data)                        #Calling up the transformation from coordinate C- to E-frame for the vector dataset                 
 
 # =============================================================================
 # Converting the coordinate database from the E frame to the P frame
@@ -180,13 +181,13 @@ def E_to_P(E_frame):                                                           #
         np.arctan2(coor_E_data[i,0], coor_E_data[i,2])                         #Angle between the z-axis in the E-frame and the sun vector, depicted in the (z,x)-plane in the E-frame   
 
         T_PE = np.array([[np.cos(beta), np.sin(beta)*np.sin(alpha), \
-                          np.sin(beta)*np.cos(beta)],
+                          np.sin(beta)*np.cos(alpha)],
                  [0., np.cos(alpha), -np.sin(alpha)],
                  [-np.sin(beta), np.cos(beta)*np.sin(alpha), \
                   np.cos(beta)*np.cos(alpha)]])                                #Transformation matrix from the E- to the P-frame 
         
         temp[i] = np.dot(T_PE, E_frame[i,:3])
-        
+
     return temp
 
 coor_P_data = E_to_P(coor_E_data)                                              #Calling up the transformation from coordinate E- to P-frame for the coordinate dataset     
