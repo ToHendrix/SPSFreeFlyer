@@ -109,8 +109,8 @@ j = 0;
 %==========================================================================
 % Set Time input of moments of interest IN MINUTES
 %==========================================================================
-tfe = 24000*100 + 45;   % final orbit time end
-tfs = tfe - 1000;      % final orbit time start
+tfe = 27000*100 -18;   % final orbit time end
+tfs = tfe - 100;      % final orbit time start
 ti = 0; % initial orbit time
 
 %==========================================================================
@@ -123,7 +123,7 @@ while tfs < tfe
     tfs = tfs + 1;
     i = i + 1;
 end
-while ti < 1000 % initial orbit time period range
+while ti < 100 % initial orbit time period range
     tsince = ti;
     [pos, vel] = sgp4(tsince, satdata);
     position2 = [position2; [transpose(pos) j]];
@@ -141,7 +141,7 @@ end
 % Give and plot output
 %==========================================================================
 figure;hold on
-Re = 6378.137;
+Re = 6371.000;
 [x y z] = sphere;
 a=[0 0 0 Re];
 s1=surf(x*a(1,4)+a(1,1),y*a(1,4)+a(1,2),z*a(1,4)+a(1,3));
