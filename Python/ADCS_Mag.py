@@ -12,7 +12,8 @@ Created on Wed Jun  5 14:32:59 2019
 # =============================================================================
 # Importing used packages, systems and files
 # =============================================================================
-from Database import magn_sph_data, E_to_P
+from Database import magn_sph_data, E_to_P1, P1_to_P, z_P, Sun_E_data, \
+coor_P1_data , coor_E_data
 import numpy as np
 
 # =============================================================================
@@ -32,7 +33,8 @@ magn_sph_data[:,1] = -magn_sph_data[:,1]                                       #
 magn_sph_data[:,0] = -magn_sph_data[:,0] 
 magn_E_data = magn_sph_data*10**-4                                             #Writing the magnetic field array to the correct named variable and unit [T]
 
-magn_P_data = E_to_P(magn_E_data)                                              #Tranforming the magnetic field from the E- to P-frame         
+magn_P1_data = E_to_P1(magn_E_data, Sun_E_data, coor_E_data)                   #Tranforming the magnetic field from the E- to P-frame         
+magn_P_data = P1_to_P(magn_P1_data, z_P, coor_P1_data)
 
 for i in range(len(magn_P_data)):
     M_ext_magn[i] = np.cross(magn_P_data[i], np.transpose(M_res_dip))          #Calculating magnetic field disturbance torque at every instance 
