@@ -1,6 +1,7 @@
 # Import necessary things
 import scipy
 from Database import *
+import numpy as np
 #-----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------ Import Stuff from the Database --------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------
@@ -14,7 +15,7 @@ Vu = np.array([Vx, Vy, Vz])/V  # Unit velocity direction vector [m/s]
 # Define Dimensions
 r_plate = np.array([0, 0, .5 * h]) # This is the distance vector from cylinder coordinate system center to the plate center of pressure [m]
 r_wall = np.array([Vu[0][:]*d/2, Vu[1][:]*d/2, np.zeros(43201)]) # Distance vector from center of cylinder coordinate system to outer center of pressure [m]
-r_com = np.array([0.0015, 0.0015, 0*h/2]) # This is the vector CG location with respect to the geometric center [m]
+r_com = np.array([0.0015/np.sqrt(2), 0.0015/np.sqrt(2), 0*h/2]) # This is the vector CG location with respect to the geometric center [m]
 
 # Density and Beta
 beta = np.cos(-Vu[2])  # Angle defined in Oomen for P-frame F_wall decomposition [rad]

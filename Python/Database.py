@@ -30,7 +30,7 @@ r_in = d/2.                                                                    #
 r_out = r_in+20e-2                                                             #Outer radius of the cylinderised SPS [m] 
 C_D = 2.                                                                       #[-] not sure, just using a high value
 m = 250.                                                                       #Mass of the SPS [kg]  
-z_C = np.array([0., 0., 1.])
+z_C = np.array([0., 0., 10.**308])
 
 # =============================================================================
 # Creating the databases
@@ -228,7 +228,7 @@ def P1_to_P(P1_frame, new_angle, old_angle):                                   #
     return temp
 
 z_E = z_C_to_z_E(z_C, coor_elli_data)
-z_P = E_to_P1(z_E, Sun_E_data, coor_E_data)
+z_P1 = E_to_P1(z_E, Sun_E_data, coor_E_data)
 
-coor_P_data = P1_to_P(coor_P1_data, z_P, coor_P1_data)
-vect_P_data = P1_to_P(vect_P1_data, z_P, coor_P1_data)
+coor_P_data = P1_to_P(coor_P1_data, z_P1, coor_P1_data)
+vect_P_data = P1_to_P(vect_P1_data, z_P1, coor_P1_data)
