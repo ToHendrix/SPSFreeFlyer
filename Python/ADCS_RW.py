@@ -50,5 +50,5 @@ for i in range(len(tau_orb)):
     RW_tau_orb[i] = sum(tau_bld_RW[i])                                         #Total momentum build-up of a reaction wheel in the pyramid system per orbit [Nm]
 
 for i in range(len(RW_num_orb)):
-    RW_num_orb[i] = [sum(RW_tau_orb)/RW_cap_mom[i], \
-              431/(sum(RW_tau_orb)/RW_cap_mom[i])]                             #Amount of momentum dumps in 30 days, Amount of orbits before a momentum dump 
+    RW_num_orb[i] = [sum(np.abs(RW_tau_orb))/RW_cap_mom[i], \
+              431/(sum(np.abs(RW_tau_orb))/RW_cap_mom[i])]                     #Amount of momentum dumps in 30 days, Amount of orbits before a momentum dump 
