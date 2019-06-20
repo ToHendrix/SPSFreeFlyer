@@ -30,6 +30,7 @@ r_in = d/2.                                                                    #
 r_out = r_in+20e-2                                                             #Outer radius of the cylinderised SPS [m] 
 C_D = 2.                                                                       #[-] not sure, just using a high value
 m = 250.                                                                       #Mass of the SPS [kg]  
+z_C = np.array([0., 0., 1.])
 
 # =============================================================================
 # Creating the databases
@@ -115,7 +116,7 @@ def I_to_C():
                          [0, 0, 1]])
         temp[i,0:3] = np.dot(T_CI, vect_I_data[i,9:12])                        #Appending the transformation for the velocities [km/s] 
         temp[i,3:6] = np.dot(T_CI, vect_I_data[i,12:15])                       #Appending the transformation for the normalised sun vector [-] 
-    
+
     return temp
     
 vect_C_data = I_to_C()                                                         #V_x [km s^-1], V_y [km s^-1], V_z [km s^-1], Sun_norm_x [-], Sun_norm_y [-], Sun_norm_z [-]     
@@ -167,18 +168,18 @@ coor_E_data = C_to_E(coor_C_data, coor_elli_data)                              #
 vect_E_data = C_to_E(vect_C_data[:,:3], coor_elli_data)                        #Calling up the transformation from coordinate C- to E-frame for the vector dataset                 
 
 # =============================================================================
-# Converting the coordinate database from the E frame to the P frame
+# Converting the coordinate database from the E frame to the P1 frame
 # =============================================================================
 Sun_E_data = C_to_E(vect_C_data[:,-3:], coor_elli_data)                        # Converting the Sun vector from the C- to the P-frame 
 
-def E_to_P(E_frame):                                                           #Definition to transform from the E- to the P-frame with the z-axis pointing at the Sun 
+def E_to_P1(E_frame, new_angle, old_angle):                                    #Definition to transform from the E- to the P-frame with the z-axis pointing at the Sun 
     temp = np.zeros((43201,3))
     
     for i in range(len(E_frame[:,0])):
-        alpha = np.arctan2(Sun_E_data[i,1], Sun_E_data[i,2]) -\
-        np.arctan2(coor_E_data[i,1], coor_E_data[i,2])                         #Angle between the z-axis in the E-frame and the sun vector, depicted in the (z,y)-plane in the E-frame     
-        beta = np.arctan2(Sun_E_data[i,0], Sun_E_data[i,2]) - \
-        np.arctan2(coor_E_data[i,0], coor_E_data[i,2])                         #Angle between the z-axis in the E-frame and the sun vector, depicted in the (z,x)-plane in the E-frame   
+        alpha = np.arctan2(new_angle[i,1], new_angle[i,2]) -\
+        np.arctan2(old_angle[i,1], old_angle[i,2])                             #Angle between the z-axis in the E-frame and the sun vector, depicted in the (z,y)-plane in the E-frame     
+        beta = np.arctan2(new_angle[i,0], new_angle[i,2]) - \
+        np.arctan2(old_angle[i,0], old_angle[i,2])                             #Angle between the z-axis in the E-frame and the sun vector, depicted in the (z,x)-plane in the E-frame   
 
         T_PE = np.array([[np.cos(beta), np.sin(beta)*np.sin(alpha), \
                           np.sin(beta)*np.cos(alpha)],
@@ -190,5 +191,44 @@ def E_to_P(E_frame):                                                           #
 
     return temp
 
-coor_P_data = E_to_P(coor_E_data)                                              #Calling up the transformation from coordinate E- to P-frame for the coordinate dataset     
-vect_P_data = E_to_P(vect_E_data)                                              #Calling up the transformation from coordinate E- to P-frame for the vector dataset              
+coor_P1_data = E_to_P1(coor_E_data, Sun_E_data, coor_E_data)                   #Calling up the transformation from coordinate E- to P1-frame for the coordinate dataset     
+vect_P1_data = E_to_P1(vect_E_data, Sun_E_data, coor_E_data)                   #Calling up the transformation from coordinate E- to P1-frame for the vector dataset              
+
+# =============================================================================
+# Converting the coordinate database from the P1 frame to the P frame
+# =============================================================================
+def z_C_to_z_E(vector, angles):                                                #Definition to transform from the C- to the E-frame for the reference vector 
+    temp = np.zeros((43201,3))                                                 #Creating initial array to append to 
+    
+    for i in range(len(angles[:,0])):
+        T_EC = np.array([[-np.sin(angles[i,2])*np.cos(angles[i,3]), \
+                          -np.sin(angles[i,2])*np.cos(angles[i,3]), \
+                          np.cos(angles[i,2])],
+                         [-np.sin(angles[i,3]), np.cos(angles[i,3]), 0],
+                         [-np.cos(angles[i,2])*np.cos(angles[i,3]), \
+                          -np.cos(angles[i,2])*np.sin(angles[i,3]), \
+                          -np.sin(angles[i,2])]])                              #Transformation matrix from the C- to the E-frame 
+        temp[i] = np.dot(T_EC, vector)                                         #Transforming every data point in the line used 
+
+    return temp
+
+def P1_to_P(P1_frame, new_angle, old_angle):                                   #Definition to transform from the P1- to the P-frame with the z-axis pointing at the Sun 
+    temp = np.zeros((43201,3))
+    
+    for i in range(len(new_angle[:,0])):
+        gamma = np.arctan2(new_angle[i,1], new_angle[i,0]) -\
+        np.arctan2(old_angle[i,1], old_angle[i,0])                             #Angle between the x-axis in the P1-frame and the reference, depicted in the (x,y)-plane in the P1-frame     
+
+        T_PP1 = np.array([[np.cos(gamma), np.sin(gamma), 0],                   #Transformation matrix from the GEI to GEO reference frame             
+                         [-np.sin(gamma), np.cos(gamma), 0],
+                         [0, 0, 1]])
+        
+        temp[i] = np.dot(T_PP1, P1_frame[i])
+
+    return temp
+
+z_E = z_C_to_z_E(z_C, coor_elli_data)
+z_P = E_to_P1(z_E, Sun_E_data, coor_E_data)
+
+coor_P_data = P1_to_P(coor_P1_data, z_P, coor_P1_data)
+vect_P_data = P1_to_P(vect_P1_data, z_P, coor_P1_data)
