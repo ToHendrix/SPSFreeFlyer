@@ -10,7 +10,7 @@ from Magnetorquer_calc import tau_orb_crop, get_Js, angle_magn
 from ADCS_Mag import magn_P_data
 import os
 import matplotlib.pyplot as plt
-from ADCS_combined import tau_orb
+from ADCS_combined import tau_orb, tau_build
 
 # =============================================================================
 # Variables
@@ -21,6 +21,7 @@ attitude = []
 initial_attitude = [0, 0 , 0]
 
 attitude.append(initial_attitude)
+I_x = 0.013026
 MMOI = [45.868,
        45.868,
        83.298] #kg * m^2
@@ -90,9 +91,9 @@ def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0):
     
         for i in range(3):
             if omega_mat[i] > 0:
-                dipole[i] = abs(dipole[i])
-            elif omega_mat[i] <= 0:
                 dipole[i] = - abs(dipole[i])
+            elif omega_mat[i] <= 0:
+                dipole[i] = abs(dipole[i])
         
         orbit_torque = get_Js(dipole, minute)
     
@@ -120,7 +121,7 @@ def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0):
         # to be added
         # =============================================================================
         
-        omega_dot = omega_bar**4 - abs(J_bar)**-1 * (orbit_torque + tau_orb_crop[minute])
+        omega_dot = omega_bar**4 - J_bar**-1 * (orbit_torque + (tau_build[minute]))
         
 #        print(omega_dot)
 #        print("angular velocities \n", omega_mat)

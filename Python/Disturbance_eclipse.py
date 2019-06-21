@@ -66,11 +66,8 @@ def calculate_angular_velocity():
         # The resulting equation in which the external moments and control moments need
         # to be added
         # =============================================================================
-        #print("omega_dot =", omega_bar[0][0], "+ ", J_bar[0][0]**-1, "x Jc \n")
         
         omega_dot = omega_bar**4 - J_bar**-1 * (tau_orb[minute][0:3])
-
-        #print(omega_bar**2, J_bar**-1 * (orbit_torque[count] + tau_orb_crop[count]))
         
         attitude = [attitude[0] + (omega_mat[minute][0])*60,
                         attitude[1] + (omega_mat[minute][1])*60, attitude[2] + omega_mat[minute][2]*60]
@@ -78,10 +75,11 @@ def calculate_angular_velocity():
         omega_mat.append([omega_mat[minute][0] + (omega_dot[0]), 
                           omega_mat[minute][1]+ (omega_dot[1]), omega_mat[minute][2] + (omega_dot[2])])
         
-        print(attitude)
+
     return omega_mat[-1], minute
 
 
-#for k in range(1,30):
-EOE_omega, count = calculate_angular_velocity()
-print("Time to detumble after eclipse: ", calculate_detumble_time(10, EOE_omega, count) - t_ecl)
+for j in range(1,30):
+    k = j/10
+    EOE_omega, count = calculate_angular_velocity()
+    print("Time to detumble after eclipse: ", calculate_detumble_time(k, EOE_omega, count))
