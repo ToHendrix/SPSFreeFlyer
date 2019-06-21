@@ -32,8 +32,9 @@ I_zz = 0.5*m*(r_out**2 + r_in**2)                                              #
 # =============================================================================
 #Source: https://link.springer.com/content/pdf/bbm%3A978-3-642-25749-0%2F1.pdf
 for i in range(len(coor_P_data)):
-    r_p = coor_P_data[i,:3]/(np.sqrt((coor_P_data[i,0])**2+\
-                (coor_P_data[i,1])**2 +(coor_P_data[i,2])**2))                 #Normalised distance vector to the centre of the earth in the P-frame  
+    r_p = -coor_P_data[i,:3]/(np.sqrt((coor_P_data[i,0])**2+\
+                (coor_P_data[i,1])**2 +(coor_P_data[i,2])**2))                 #Normalised distance vector to the centre of the earth in the P-frame 
+
     J = np.array([[I_xx, 0, 0],                                                #MMOI matrix     
                   [0, I_yy, 0],
                   [0, 0, I_zz]])
