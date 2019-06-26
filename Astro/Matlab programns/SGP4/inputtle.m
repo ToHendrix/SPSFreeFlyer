@@ -8,7 +8,7 @@ ah = 850*10^3;
 mu = 3.986004415*10^14;
 Cd = 2;
 m = 250.;
-A = 1.;
+A = 1.0;
 Cdc3 = 2.0
 mc3 = 3
 Ac3 = 3.265*10^(-2)
@@ -18,7 +18,7 @@ Bstarc3 = 0.73533*10^(-4)
 % Calculate other starting values
 perigee = ph + Re;
 apogee = ah + Re;
-a = (perigee + apogee)/2;
+a = (perigee + apogee)/2
 e = 1. - perigee/a
 
 bcoeffc3 = (mc3/(Cdc3*Ac3))
