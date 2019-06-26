@@ -7,7 +7,7 @@ Created on Tue Jun 18 11:53:23 2019
 
 import numpy as np
 import matplotlib.pyplot as plt
-from ADCS_combined import tau_orb
+from ADCS_combined import tau_build
 from Precession_influence import calculate_detumble_time
 
 # =============================================================================
@@ -41,6 +41,7 @@ def calculate_angular_velocity():
     omega_mat = []
     omega_mat.append([0, 0, 0])
     attitude = ([0,0,0])
+    omega_dot = [0,0,0]                                                         #initial acceleration, assumed to be 0
     
     for minute in range(0, t_ecl):    
         # =============================================================================
@@ -56,18 +57,16 @@ def calculate_angular_velocity():
                 [-rho_1*rho_2*mass, MMOI[1], -rho_2*rho_3*mass],
                 [-rho_1*rho_3*mass, -rho_2*rho_3*mass, MMOI[2]]]
         
-        
-        omega_bar = np.matmul(omega_mat[minute], bees[minute])
-        
-        inter = np.matmul(J_mat, bees[minute])
-        J_bar = np.matmul(np.transpose(bees[minute]), inter)
+
         
         # =============================================================================
         # The resulting equation in which the external moments and control moments need
         # to be added
         # =============================================================================
         
-        omega_dot = omega_bar**4 - J_bar**-1 * (tau_orb[minute][0:3])
+        omega_dot[0] = ((tau_build[minute][0]) + ((MMOI[1]-MMOI[2]) * omega_mat[minute][1] * omega_mat[minute][2]))/ MMOI[0]
+        omega_dot[1] = ((tau_build[minute][1]) + ((MMOI[2]-MMOI[0]) * omega_mat[minute][2] * omega_mat[minute][0]))/ MMOI[1]
+        omega_dot[2] = ((tau_build[minute][2]) + ((MMOI[0]-MMOI[1]) * omega_mat[minute][0] * omega_mat[minute][1]))/ MMOI[2]
         
         attitude = [attitude[0] + (omega_mat[minute][0])*60,
                         attitude[1] + (omega_mat[minute][1])*60, attitude[2] + omega_mat[minute][2]*60]
@@ -75,11 +74,11 @@ def calculate_angular_velocity():
         omega_mat.append([omega_mat[minute][0] + (omega_dot[0]), 
                           omega_mat[minute][1]+ (omega_dot[1]), omega_mat[minute][2] + (omega_dot[2])])
         
-
+    print(attitude)
     return omega_mat[-1], minute
 
 
-for j in range(1,30):
-    k = j/10
-    EOE_omega, count = calculate_angular_velocity()
-    print("Time to detumble after eclipse: ", calculate_detumble_time(k, EOE_omega, count))
+
+EOE_omega = calculate_angular_velocity()
+
+print("Time to detumble after eclipse: ", calculate_detumble_time(15, EOE_omega, 7))

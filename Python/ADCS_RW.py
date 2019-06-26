@@ -15,6 +15,7 @@ Created on Fri Jun 14 10:42:45 2019
 # =============================================================================
 from ADCS_combined import tau_orb, tau_orb_max, M_ext_avg
 import numpy as np
+import matplotlib.pyplot as plt
 # https://www.researchgate.net/profile/Abolfazl_Shirazi2/publication/276216468_Pyramidal_reaction_wheel_arrangement_optimization_of_satellite_attitude_control_subsystem_for_minimizing_power_consumption/links/566e4c6d08ae1a797e4061cc.pdf?origin=publication_list
 
 # =============================================================================
@@ -52,3 +53,68 @@ for i in range(len(tau_orb)):
 for i in range(len(RW_num_orb)):
     RW_num_orb[i] = [sum(np.abs(RW_tau_orb))/RW_cap_mom[i], \
               431/(sum(np.abs(RW_tau_orb))/RW_cap_mom[i])]                     #Amount of momentum dumps in 30 days, Amount of orbits before a momentum dump 
+    
+
+def calculate_system_charasteristics(tau_max):
+    tau_max_wheel = tau_max                                                         #Max torque delivered by one momentum wheel. [Nm]
+    tau_z = 4 * tau_max_wheel * np.sin(kappa) 
+    tau_x = 2 * tau_max_wheel * np.cos(kappa)
+    tau_y = 2 * tau_max_wheel * np.cos(kappa)
+    
+    return tau_x, tau_y, tau_z
+
+def leave_eclipse(tau_x, tau_y, tau_z):
+    initial_angle = [45 * (np.pi/180), 0 * (np.pi/180), 0* (np.pi/180)]
+    
+    angle = initial_angle
+    omega = [0, 0, 0]
+    count = 0
+    
+    MMOI = [45.868, 45.868, 83.298]
+    
+    omega_dot = [tau_x /  MMOI[0], tau_y / MMOI[1], tau_z / MMOI[2]]
+    
+    while (angle[0]  > initial_angle[0]/2) or (angle[1]  > initial_angle[1]/2) or (angle[2]  > initial_angle[2]/2):
+        for i in range(3):
+            omega[i] += omega_dot[i]
+            
+            angle[i] -= omega[i]
+            
+        count += 1
+    
+    return count *2
+
+#turningtime = []
+#x_values = []
+#for i in range(1, 11):
+#    j = i/100
+#    print(j)
+#    torques = calculate_system_charasteristics(j)
+#    turningtime.append(leave_eclipse(torques[0], torques[1], torques[2]))
+#    x_values.append(j)
+#    plt.plot(x_values, turningtime)
+#    plt.title("Time to regain sun pointing attitude after eclipse for different reaction wheels")
+#    plt.ylabel("Time to change angle(min)")
+#    plt.xlabel("Torque Cap of the wheel [Nm]")
+#    plt.show()
+    
+torques = calculate_system_charasteristics(0.1)
+print(leave_eclipse(torques[0], torques[1], torques[2]))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
