@@ -34,7 +34,12 @@ def angle_magn(magnetic_data):
 # dipole vector which depends on the angle wrt the magnetic field
 # =============================================================================
 def get_Js(dipole, count):
+<<<<<<< HEAD
     orbit_torque = dipole * abs(magn_P_data[count])
+=======
+    orbit_torque = dipole * abs(magn_P_data[count]) *600
+#    print("orbit torque \n", orbit_torque)
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
     return orbit_torque
 
     

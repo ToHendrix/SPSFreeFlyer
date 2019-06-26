@@ -16,12 +16,22 @@ from ADCS_combined import tau_orb, tau_build
 # Variables
 # =============================================================================
 
+<<<<<<< HEAD
 simulation = 2
+=======
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
 attitude = []
 
 initial_attitude = [0, 0 , 0]
 
 attitude.append(initial_attitude)
+<<<<<<< HEAD
+=======
+I_x = 0.013026
+MMOI = [45.868,
+       45.868,
+       83.298] #kg * m^2
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
 
 mass = 250 #kg
 
@@ -74,16 +84,24 @@ def calculate_angle(theta_B, phi_B, omega_B, theta_sc, phi_sc, omega_sc):
     return theta, omega, phi
     
 
+<<<<<<< HEAD
 def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0, MMOI = [45.868, 45.868, 83.298], off = 1):
+=======
+def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0):
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
     count = 0;
     dipole = ([initial_dipole, initial_dipole, initial_dipole])
     # =============================================================================
     #Starting values for angular velocity    
     # =============================================================================
     omega_mat = omega_matrix
+<<<<<<< HEAD
     cycle = 0
     
     omega_dot = [0,0,0]                                                         #initial acceleration, assumed to be 0
+=======
+    
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
     
     
     while not (-margin < omega_mat[0] < margin) or not (-margin < omega_mat[1]< margin)  or not (-margin < omega_mat[2] < margin):
@@ -95,10 +113,14 @@ def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0, MMOI = [45
                 dipole[i] = abs(dipole[i])
         
         orbit_torque = get_Js(dipole, minute)
+<<<<<<< HEAD
         
 
         
         cycle = cycle + 1
+=======
+    
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
         # =============================================================================
         # Calculation of J, the inertia dyadic
         # =============================================================================
@@ -112,11 +134,16 @@ def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0, MMOI = [45
                 [-rho_1*rho_2*mass, MMOI[1], -rho_2*rho_3*mass],
                 [-rho_1*rho_3*mass, -rho_2*rho_3*mass, MMOI[2]]]
         
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
         omega_bar = np.matmul(np.transpose(omega_mat), bees[minute])
         
         inter = np.matmul(J_mat, bees[minute])
         J_bar = np.matmul(np.transpose(bees[minute]), inter)
+<<<<<<< HEAD
         #new
         if (cycle < 11):
             omega_dot[0] = ((orbit_torque[0] *60 + tau_build[minute][0]) + ((MMOI[1]-MMOI[2]) * omega_mat[1] * omega_mat[2]))/ MMOI[0]
@@ -135,6 +162,18 @@ def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0, MMOI = [45
             omega_dot[1] = ((tau_build[minute][1]) + ((MMOI[2]-MMOI[0]) * omega_mat[2] * omega_mat[0]))/ MMOI[1]
             omega_dot[2] = ((tau_build[minute][2]) + ((MMOI[0]-MMOI[1]) * omega_mat[0] * omega_mat[1]))/ MMOI[2]
             cycle = 0
+=======
+        
+        # =============================================================================
+        # The resulting equation in which the external moments and control moments need
+        # to be added
+        # =============================================================================
+        
+        omega_dot = omega_bar**4 - J_bar**-1 * (orbit_torque + (tau_build[minute]))
+        
+#        print(omega_dot)
+#        print("angular velocities \n", omega_mat)
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
         
         omega_mat[0] = omega_mat[0] + ((omega_dot[0]))
         omega_mat[1] = omega_mat[1] + ((omega_dot[1]))
@@ -142,6 +181,7 @@ def calculate_detumble_time(initial_dipole, omega_matrix, minute = 0, MMOI = [45
 
         #update all used values, angles and other shizzle
         count = count + 1
+<<<<<<< HEAD
         theta_B, omega_B, phi_B = angle_magn(tau_build[count])
         theta_sc, omega_sc, phi_sc = calculate_sc_angle(count, omega_mat) 
         theta, omega, phi = calculate_angle(theta_B, phi_B, omega_B, theta_sc, phi_sc, omega_sc)
@@ -289,6 +329,59 @@ if (simulation == 5):
     
     
     
+=======
+        theta_B, omega_B, phi_B = angle_magn(tau_orb[count])
+        theta_sc, omega_sc, phi_sc = calculate_sc_angle(count, omega_mat) 
+        theta, omega, phi = calculate_angle(theta_B, phi_B, omega_B, theta_sc, phi_sc, omega_sc)
+        
+        dipole = ([(phi/(90*(np.pi/180)))*initial_dipole, (theta/(90*(np.pi/180)))*initial_dipole, (omega/(90*(np.pi/180)))*initial_dipole])
+
+        
+        if count == 430:
+            return -2;
+
+    return count
+
+
+            
+x = []
+detumble_times1= []
+detumble_times2= [] 
+detumble_times3= []  
+k = 1;
+for k in range(k, 421, 1):
+#    omega_mat1 = np.array([[1.5 * (np.pi/180)],
+#          [0 * np.pi/180],
+#          [1.75 * (np.pi/180)]]) #rad/s
+    omega_mat2 = np.array([[0.75 * (np.pi/180)],
+      [0.75 * np.pi/180],
+      [1.75 * (np.pi/180)]]) #rad/s
+#    omega_mat3 = np.array([[0 * (np.pi/180)],
+#          [1.5* np.pi/180],
+#          [1.75 * (np.pi/180)]]) #rad/s
+    j = k/10
+#    y1 = calculate_detumble_time(j, omega_mat1)
+    y2 = calculate_detumble_time(j, omega_mat2)
+#    y3 = calculate_detumble_time(j, omega_mat3)
+#    detumble_times1.append(y1)
+    detumble_times2.append(y2)
+#    detumble_times3.append(y3)
+    
+    x.append(j)
+
+plt.plot(x, detumble_times2, 'r')
+#, x,  detumble_times2, 'b', x, detumble_times3, 'g')
+plt.axvline(x=1)
+plt.axvline(x=15)
+plt.text(x[9], detumble_times2[9], '  ({}, {})'.format(x[9], detumble_times2[9]))
+plt.text(x[149], detumble_times2[149]+ 8, '  ({}, {})'.format(x[149], detumble_times2[149]))
+plt.title("Time to detumble for different values of linear dipole moment")
+plt.xlabel("Linear dipole moment(Am^2)")
+plt.ylabel("Time to detumble(min)")
+plt.show()
+
+
+>>>>>>> eed9440db50205d29f7a782ccadc133f098239b7
 
 
 
